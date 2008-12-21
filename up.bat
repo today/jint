@@ -1,0 +1,1 @@
+C:\google_appengine\appcfg.py update jint/
