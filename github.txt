@@ -35,19 +35,4 @@ Next steps:
   git push origin master
       
 
-Existing Git Repo?
-
-  cd existing_git_repo
-  git remote add origin git@github.com:today/jint.git
-  git push origin master
-      
-
-Importing a SVN Repo?
-
-  Click here
-      
-
-When you're done:
-
-  Continue
 
