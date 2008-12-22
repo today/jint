@@ -1,0 +1,53 @@
+
+today / jint edit watchwatch
+private
+This repository is private. All pages are served over SSL and all pushing and pulling is done over SSH. No one may fork, clone, or view it unless they are added as a member.
+
+Every repository with this icon (private) is private.
+public
+This repository is public. Anyone may fork, clone, or view it.
+
+Every repository with this icon (public) is public.
+Description: 	Jin Tian's TODO List edit
+Homepage: 	http://jint.appspot.com/ edit
+Public Clone URL: 	git://github.com/today/jint.git
+Give this clone URL to anyone.
+git clone git://github.com/today/jint.git
+Your Clone URL: 	
+git@github.com:today/jint.git
+Use this clone URL yourself.
+git clone git@github.com:today/jint.git
+Global setup:
+
+  Download and install Git
+  git config --global user.email today.xa@gmail.com
+      
+
+Next steps:
+
+  mkdir jint
+  cd jint
+  git init
+  touch README
+  git add README
+  git commit -m 'first commit'
+  git remote add origin git@github.com:today/jint.git
+  git push origin master
+      
+
+Existing Git Repo?
+
+  cd existing_git_repo
+  git remote add origin git@github.com:today/jint.git
+  git push origin master
+      
+
+Importing a SVN Repo?
+
+  Click here
+      
+
+When you're done:
+
+  Continue
+
