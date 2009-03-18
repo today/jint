@@ -54,7 +54,7 @@ class MainPage(webapp.RequestHandler):
               go_result(1, key);
            }
            else{
-           		resultArea.children(".cls_right").attr("src","images/wrong.png").show();
+              resultArea.children(".cls_right").attr("src","images/wrong.png").show();
 
               $(this).css("color","red");
               resultArea.children(".cls_rightanswer").css("color","red");
@@ -75,17 +75,17 @@ class MainPage(webapp.RequestHandler):
         );
         
         $(".cls_purewin").each(function(i){
-				   
-				   num = $(this).text();
-				   if( 10 < num ){
-				   		$(this).parent().hide();
-				   }
-				   
-				}); 
-				
-				$("input[name='b1']").click(function(event){
-					$(".cls_exam").show();
-				}); 
+           
+           num = $(this).text();
+           if( 10 < num ){
+              $(this).parent().hide();
+           }
+           
+        }); 
+        
+        $("input[name='b1']").click(function(event){
+          $(".cls_exam").show();
+        }); 
       });
       
       var go_result = function(right, key){
@@ -98,9 +98,9 @@ class MainPage(webapp.RequestHandler):
         
         //alert(url);
         $.ajaxSetup({
-				  cache: false,
-				  type: "GET"
-				});
+          cache: false,
+          type: "GET"
+        });
         $.get(url,{}, function(data){
           //alert("Data Loaded: " + data);
         }); 
@@ -117,18 +117,31 @@ class MainPage(webapp.RequestHandler):
     self.response.out.write('<div><span class="cls_big">Hello, %s! The word is <b>%s</b> </span>' % (nickname, req_word) )
     self.response.out.write('<span class="cls_rightalign"><input type="button" name="b1" value="Show All"></span></div><hr/>' )
 
+    results222 = db.GqlQuery("SELECT * FROM Result WHERE word=:1 AND owner=:2", req_word, user )
+    resultDict = {}
+    for result222 in results222:
+        resultDict[result222.reciteKey.key()] = result222
+    
     recites = db.GqlQuery("SELECT * FROM Recite WHERE word=:1 LIMIT 30",  req_word )
+    
 
     for recite in recites:
-    	
-      results = db.GqlQuery("SELECT * FROM Result WHERE reciteKey=:1 ",  recite.key() )
+      
+      #results = db.GqlQuery("SELECT * FROM Result WHERE reciteKey=:1 ",  recite.key() )
       
       rightCount = 0
       wrongCount = 0
-      
-      for result in results:
+      if resultDict.has_key(recite.key()):
+        result = resultDict[recite.key()]      
         rightCount = result.rightCount
         wrongCount = result.wrongCount
+      
+      
+      
+      
+      #for result in results:
+      #  rightCount = result.rightCount
+      #  wrongCount = result.wrongCount
 
       self.response.out.write('<div class="cls_exam">')
       self.response.out.write('<span>%s &nbsp;&nbsp; %s-%s=</span><span class="cls_purewin" ><b>%s</b></span>' % (recite.question, rightCount, wrongCount, rightCount-wrongCount ) )
