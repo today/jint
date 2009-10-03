@@ -14,9 +14,9 @@ class Recite(db.Model):
 class MainPage(webapp.RequestHandler):
   def get(self):
     user = users.get_current_user()
-    nickname = 'guest';
+    nickName = 'guest';
     if user:
-      nickname = user.nickname()
+      nickName = user.nickname()
     else:
       self.redirect(users.create_login_url(self.request.uri))
 
@@ -26,7 +26,8 @@ class MainPage(webapp.RequestHandler):
       .cls_try { FONT-FAMILY: verdana; font-size: 24px; border-color: black black #000000; border-style: solid; border-top-width: 0px; border-right-width: 0px; border-bottom-width: 1px; border-left-width: 0px}
       .cls_rightanswer { FONT-FAMILY: verdana; font-size: 24px; }
       .cls_big { FONT-FAMILY: verdana; font-size: 24px; }
-      .cls_rightanswer  { text-align:right }
+      .cls_rightalign  { align:right }
+      
       </style>
       <script>
       $(document).ready(function(){
@@ -51,7 +52,8 @@ class MainPage(webapp.RequestHandler):
 
               $(this).css("color","green");
 
-              go_result(1, key);
+              go_result(1, key, tryanswer);
+
            }
            else{
               resultArea.children(".cls_right").attr("src","images/wrong.png").show();
@@ -59,7 +61,8 @@ class MainPage(webapp.RequestHandler):
               $(this).css("color","red");
               resultArea.children(".cls_rightanswer").css("color","red");
 
-              go_result(0, key);
+              go_result(0, key, tryanswer);
+
            }
         });
 
@@ -81,23 +84,24 @@ class MainPage(webapp.RequestHandler):
               $(this).parent().hide();
            }
 
-        });
-
+        }); 
+        
         $("input[name='b1']").click(function(event){
           $(".cls_exam").show();
-        });
+        }); 
       });
+      
+      var go_result = function(right, key, answer){
 
-      var go_result = function(right, key){
         rightFlag = '&wrong=1';
         if( 1 == right ){
           rightFlag = '&right=1';
         }
         
-        word = $(".cls_word").text();       
-
-        url = '/record?w='+ word + rightFlag + '&key=' + key;
-
+        url = '/record?w=achieve' + rightFlag + '&key=' + key + '&answer=' + answer;
+        
+        //alert(url);
+        
         $.ajaxSetup({
           cache: false,
           type: "GET"
@@ -115,8 +119,16 @@ class MainPage(webapp.RequestHandler):
     if self.request.get('w'):
       req_word = self.request.get('w')
 
-    self.response.out.write('<div><span class="cls_big">Hello, %s! The word is <span class="cls_word">%s</span> </span>' % (nickname, req_word) )
-    self.response.out.write('<span class="cls_rightalign"><input type="button" name="b1" value="Show All"></span></div><hr/>' )
+
+    log = reciteLog()
+    log.owner = user
+    log.word =  req_word
+    log.grade = '0'
+    log.status = 'start'
+    log.put()
+      
+    self.response.out.write('<span class="cls_big">The word is <b>%s</b> </span>' % (req_word) )
+    self.response.out.write('<span class="cls_rightalign"> %s | <a href=\"%s\">Sign out</a></span><hr/>' %( nickName, users.create_logout_url("/")))
 
     results222 = db.GqlQuery("SELECT * FROM Result WHERE word=:1 AND owner=:2", req_word, user )
     resultDict = {}
@@ -128,8 +140,8 @@ class MainPage(webapp.RequestHandler):
 
     for recite in recites:
 
-      #results = db.GqlQuery("SELECT * FROM Result WHERE reciteKey=:1 ",  recite.key() )
-
+      results = db.GqlQuery("SELECT * FROM Result WHERE reciteKey=:1 ",  recite.key() )
+      
       rightCount = 0
       wrongCount = 0
       if resultDict.has_key(recite.key()):
@@ -152,6 +164,7 @@ class MainPage(webapp.RequestHandler):
       self.response.out.write('<input type="hidden" name="key" value="%s"></span>' % recite.key())
       self.response.out.write('</div>')
 
+    self.response.out.write('<input type="button" name="b2" value="Commit Answer"> <input type="button" name="b1" value="Show All"><hr/>' )
     # Write the submission form and the footer of the page
     self.response.out.write("""<br/><br/><hr/>
           <form action="/add" method="post">
@@ -202,6 +215,21 @@ class Result(db.Model):
   rightCount = db.IntegerProperty()
   wrongCount = db.IntegerProperty()
 
+class Wrong(db.Model):
+  word =  db.StringProperty(multiline=False)
+  reciteKey = db.ReferenceProperty(Recite)
+  owner = db.UserProperty()
+  wrongText = db.StringProperty(multiline=False)
+
+class reciteLog(db.Model):
+  owner = db.UserProperty()
+  word =  db.StringProperty(multiline=False)
+  start_time = db.DateTimeProperty(auto_now_add=True)
+  end_time = db.DateTimeProperty(auto_now_add=True)
+  grade = db.StringProperty(multiline=False)
+  status = db.StringProperty(multiline=False)
+  
+
 class recordResult(webapp.RequestHandler):
   def get(self):
     # check if login
@@ -227,6 +255,15 @@ class recordResult(webapp.RequestHandler):
     wrong = 0
     if self.request.get("wrong"):
       wrong = 1
+
+      # record of wrong answer
+      wrong_db = Wrong()
+      wrong_db.word = word
+      wrong_db.reciteKey = objKey
+      wrong_db.owner = user
+      wrong_db.wrongText = self.request.get("answer")
+      wrong_db.put()
+    
 
     #result = db.get(objKey)  #Result(reciteKey=objKey, owner=user)
     results = db.GqlQuery("SELECT * FROM Result WHERE owner = :1 and reciteKey= :2 and word= :3", user, objKey, word )

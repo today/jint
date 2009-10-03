@@ -1,3 +1,2 @@
-
-C:\google_appengine\dev_appserver.py jint\  
+c:\Python25\python.exe ../../dev_appserver.py jint\  
 --clear_datastore

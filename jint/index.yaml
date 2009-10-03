@@ -10,14 +10,14 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
-# Used 12 times in query history.
+# Unused in query history -- copied from input.
 - kind: Todo
   properties:
   - name: author
   - name: startDate
     direction: desc
 
-# Used 436 times in query history.
+# Used 4 times in query history.
 - kind: Todo
   properties:
   - name: author
