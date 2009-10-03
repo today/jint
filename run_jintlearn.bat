@@ -1,1 +1,1 @@
-c:\Python25\python.exe ../dev_appserver.py jintlearn/
+c:\Python25\python.exe ../../dev_appserver.py jintlearn/

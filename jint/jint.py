@@ -36,12 +36,18 @@ class Todo(db.Model):
 
 class MainPage(webapp.RequestHandler):
   def get(self):
-    user = users.get_current_user()
+    user2 = users.get_current_user()
 
-    if user:
+    nickName = "guest";
+    if user2:
+      nickName = user2.nickname()
       self.response.headers['Content-Type'] = 'text/html'
     else:
-      self.redirect(users.create_login_url(self.request.uri))
+    	self.redirect(users.create_login_url(self.request.uri))
+
+
+    self.response.out.write(' %s |' % nickName  )
+    self.response.out.write(' <a href=\"%s\">Sign out</a><hr/>' % users.create_logout_url("/")  )
 
     self.response.out.write("""
         <html>
@@ -97,6 +103,9 @@ class MainPage(webapp.RequestHandler):
         <title>Todo List</title>
         </head><body>
         """)
+
+    
+    
 
     self.response.out.write("""<table border="0"><tr><td>""")
     self.response.out.write("""<div class="create" >
